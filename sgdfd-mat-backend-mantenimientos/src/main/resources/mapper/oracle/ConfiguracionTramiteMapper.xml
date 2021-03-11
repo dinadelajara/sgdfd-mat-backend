@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.edu.unmsm.sgdfd.mat.backend.mantenimientos.mapper.ConfiguracionTramiteMapper">
+
+	<sql id="fragmentoSelectConfiguracionTramite">
+        SELECT    vwmtr.id_tipo_tramite			AS	 idTipoTramite
+				, vwmtr.codigo_local			AS	 codigoLocal
+				, vwmtr.estado 					AS	 estado
+				, vwmtr.informacion_adicional_html			AS	 informacionAdicionalHtml
+				, vwmtr.id_requisito			AS	 idRequisito
+				, vwmtr.nombre_requisito		AS	 nombre
+				, vwmtr.indicador_obligatorio 	AS   indicadorObligatorio
+				, vwmtr.id_item 				AS   idItem
+				, vwmtr.periodo					AS   periodo
+				, vwmtr.descripcion				AS   descripcion
+				, vwmtr.codigo_dependencia		AS   codigoDependencia
+				, vwmtr.codigo_tipo_destino			AS   codigoTipoDestino
+				, vwmtr.codigo_empleado			AS 	 codigoEmpleado
+				, vwmtr.codigo_prioridad		AS	 codigoPrioridad
+				, vwmtr.indicaciones			AS   indicaciones
+				, vwmtr.codigo_motivo			AS   codigoMotivo
+				, vwmtr.dependencia				AS   dependencia
+				, vwmtr.empleado				AS   empleado
+				, vwmtr.motivo					AS   motivo
+
+    	FROM VW_MAN_CONFIGURACION_TRAMITE vwmtr
+	</sql>
+
+	<resultMap type="ConfiguracionTramiteResponse" id="ConfiguracionTramiteResultMap">
+		<id property="idTipoTramite" column="idTipoTramite"></id>
+		<id property="codigoLocal" column="codigoLocal"></id>
+
+		<result property="estado" column="estado"></result>	
+		<result property="informacionAdicionalHtml" column="informacionAdicionalHtml"></result>	
+		
+		<collection property="listaRequisitos" javaType="List" ofType="RequisitoResponse">
+			<result property="idRequisito" column="idRequisito"></result>
+			<result property="nombre" column="nombre"></result>	
+			<result property="indicadorObligatorio" column="indicadorObligatorio"></result>
+		</collection>
+		
+		<collection property="listaCronogramas" javaType="List" ofType="CronogramaVigenteResponse">	
+ 			<result property="idItem" column="idItem"></result> 
+			<result property="periodo" column="periodo"></result>
+			<result property="descripcion" column="descripcion"></result>
+
+		</collection>		
+	
+		<collection property="listaDestinatarios" javaType="List" ofType="DestinatariosResponse">
+			<result property="codigoDependencia" column="codigoDependencia"></result>
+			<result property="dependencia" column="dependencia"></result>
+			<result property="codigoTipoDestino" column="codigoTipoDestino"></result>
+			<result property="codigoEmpleado" column="codigoEmpleado"></result>	
+			<result property="empleado" column="empleado"></result>	
+			<result property="codigoPrioridad" column="codigoPrioridad"></result>		
+			<result property="indicaciones" column="indicaciones"></result>	
+			<result property="codigoMotivo" column="codigoMotivo"></result>
+			<result property="motivo" column="motivo"></result>		
+		</collection>	
+		
+	</resultMap>
+
+<!-- 	<select id="buscarTodos" resultType="TipoTramiteLocalRequisitoResponse"> -->
+<!-- 		<include refid="fragmentoSelectTipoTramiteRequisito" /> -->
+<!-- 	</select> -->
+	
+<!-- 	<select id="buscarPorIdTipoTramite" resultType="TipoTramiteLocalRequisitoResponse"> -->
+<!-- 		<include refid="fragmentoSelectTipoTramiteRequisito" /> -->
+<!-- 		<where> -->
+<!-- 		<if test="idTipoTramite != '' and idTipoTramite != null"> -->
+<!-- 			id_tipo_tramite = #{idTipoTramite} -->
+<!-- 		</if> -->
+<!-- 		</where> -->
+<!-- 	</select> -->
+	
+	
+	<select id="buscarPorIdTipoTramiteYCodigoLocal" resultMap="ConfiguracionTramiteResultMap">
+		<include refid="fragmentoSelectConfiguracionTramite" />
+		<where>
+		<if test="idTipoTramite != '' and idTipoTramite != null">
+			id_tipo_tramite = #{idTipoTramite}
+		</if>
+		<if test="codigoLocal != '' and codigoLocal != null">
+			AND codigo_local = #{codigoLocal}
+		</if>
+
+		</where>
+	</select>	
+	
+	
+	<select id="mantenerConfiguracionLocal" statementType="CALLABLE">
+		{
+		call PKG_CONFIGURACION.PRC_CONFIG_LOCAL (
+<!-- 		     #{modo,                   					jdbcType = VARCHAR, mode = IN}, -->
+             #{objetoMantenido.idTipoTramite,			jdbcType = INTEGER, mode = IN},
+             #{objetoMantenido.codigoLocal,    			jdbcType = VARCHAR, mode = IN},
+             #{objetoMantenido.estado,       			jdbcType = INTEGER, mode = IN},
+             #{objetoMantenido.informacionAdicionalHtml,  		jdbcType = VARCHAR, mode = IN},
+			 #{usuario,                    				jdbcType = VARCHAR, mode = IN}  
+             )
+         }
+	</select>
+	
+<!-- 	<select id="mantenerConfiguracionRequisito" statementType="CALLABLE"> -->
+<!-- 		{ -->
+<!-- 		call PKG_CONFIGURACION.PRC_CONFIG_REQUISITO ( -->
+<!-- 		     #{modo,                   					jdbcType = VARCHAR, mode = IN}, -->
+<!--              #{objetoMantenido.idTipoTramite,			jdbcType = INTEGER, mode = IN}, -->
+<!--              #{objetoMantenido.codigoLocal,    			jdbcType = VARCHAR, mode = IN}, -->
+<!--              #{objetoMantenido.idRequisito,				jdbcType = INTEGER, mode = IN}, -->
+<!--              #{objetoMantenido.indicadorObligatorio,	jdbcType = INTEGER, mode = IN}, -->
+<!--              #{objetoMantenido.estado,       			jdbcType = VARCHAR, mode = IN}, -->
+<!--              #{objetoMantenido.idRequisitoEliminado,	jdbcType = INTEGER, mode = IN}, -->
+<!-- 			 #{usuario,                    				jdbcType = VARCHAR, mode = IN}   -->
+<!--              ) -->
+<!--          } -->
+<!-- 	</select> -->
+	
+<!-- 	<select id="mantenerConfiguracionCronograma" statementType="CALLABLE"> -->
+<!-- 		{ -->
+<!-- 		call PKG_CONFIGURACION.PRC_CONFIG_CRONOGRAMA ( -->
+<!-- 		     #{modo,                   					jdbcType = VARCHAR, mode = IN}, -->
+<!--              #{objetoMantenido.idTipoTramite,			jdbcType = INTEGER, mode = IN}, -->
+<!--              #{objetoMantenido.codigoLocal,    			jdbcType = VARCHAR, mode = IN}, -->
+<!--              #{objetoMantenido.idItem,					jdbcType = INTEGER, mode = IN OUT}, -->
+<!--              #{objetoMantenido.periodoFecha,			jdbcType = DATA, mode = IN}, -->
+<!--              #{objetoMantenido.descripcion,       		jdbcType = VARCHAR, mode = IN}, -->
+<!--              #{objetoMantenido.idItemCronoEliminado,	jdbcType = INTEGER, mode = IN}, -->
+<!-- 			 #{usuario,                    				jdbcType = VARCHAR, mode = IN}   -->
+<!--              ) -->
+<!--          } -->
+<!-- 	</select> -->
+
+<!-- 	<select id="mantenerConfiguracionDestinatario" statementType="CALLABLE"> -->
+<!-- 		{ -->
+<!-- 		call PKG_CONFIGURACION.PRC_CONFIG_DESTINATARIO ( -->
+<!-- 		     #{modo,                   					jdbcType = VARCHAR, mode = IN}, -->
+<!--              #{objetoMantenido.idTipoTramite,			jdbcType = INTEGER, mode = IN}, -->
+<!--              #{objetoMantenido.codigoLocal,    			jdbcType = VARCHAR, mode = IN}, -->
+<!--              #{objetoMantenido.idItem,					jdbcType = INTEGER, mode = IN OUT}, -->
+<!--              #{objetoMantenido.tipoDestino,				jdbcType = VARCHAR, mode = IN}, -->
+<!--              #{objetoMantenido.codigoDependencia,		jdbcType = VARCHAR, mode = IN}, -->
+<!--              #{objetoMantenido.codigoEmpleado, 			jdbcType = VARCHAR, mode = IN}, -->
+<!--              #{objetoMantenido.codigoPrioridad,			jdbcType = VARCHAR, mode = IN}, -->
+<!--              #{objetoMantenido.indicaciones,  			jdbcType = VARCHAR, mode = IN}, -->
+<!--              #{objetoMantenido.codigoMotivo,   			jdbcType = VARCHAR, mode = IN}, -->
+<!--              #{objetoMantenido.tipoReceptor,       		jdbcType = VARCHAR, mode = IN}, -->
+<!--              #{objetoMantenido.idItemDestinatEliminado,	jdbcType = INTEGER, mode = IN}, -->
+<!-- 			 #{usuario,                    				jdbcType = VARCHAR, mode = IN}   -->
+<!--              ) -->
+<!--          } -->
+<!-- 	</select> -->
+
+</mapper>
